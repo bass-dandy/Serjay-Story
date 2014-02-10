@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="60" height="40" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="tracksuit" tilewidth="32" tileheight="32">
+  <image source="tracksuit.png" width="160" height="128"/>
+ </tileset>
+ <tileset firstgid="21" name="Collision" tilewidth="32" tileheight="32">
+  <image source="collision.png" width="96" height="32"/>
+  <tile id="0">
+   <properties>
+    <property name="floor" value=""/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="wall" value=""/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer name="Tile Layer 1" width="60" height="40">
+  <data encoding="base64" compression="zlib">
+   eJztme0KwyAMRbN139AVtvd/11U6QSRxiY01dV7Ij6aQ5mCMoQ4AcDZmp9kesw1MvyTuBezpAAtXnBvll8T9R94pP7Ui6uu7rIkG7222Y2TP7Ex1VJIX63Xv7Ex1VJK3Zj2PgNeShf3rcnO1fgW9mqf6pQXeF+jXvGXeEqK+vxfeKTBKfl84uxPf3wsvR5x98SLeUX6uatfz1irJy6ntrdXXt23V4OXMLeP3ffyO8nNltT+H585E+HMUzjeWLIc3PNepulmzvnGOmsqZN7h1Y7FftTRfcdR5035J3M5bX5037ZfE7bwyxee8hrn/AFLe0vOGV3zOa1o8M7Q6b1Bzm6SesZmvZV5MWrwl9jC2By3wOlbXX3LvoFP33bX7M7aOVC9dIyvnUaoXa96xWeHdSp037ZfEdffd/t9ZaDV9v+YrLGfOs49r1SjeNfYBRdERWA==
+  </data>
+ </layer>
+ <layer name="collision" width="60" height="40" opacity="0">
+  <data encoding="base64" compression="zlib">
+   eJzt2VEOQDAQBNBeAve/KRIfIpbdxnRHOx+TjUroY5XEUkqZBsmyZT4qU+ZLfRuPHFfe/Mj7nXev1rMt7/+9mf1snZ/Bi+gBeXm8iIzg9Xzf9eqdHrx3+6xxZm9m5O078uLjeY/3tF55vef6Ns7s9c4r6vVeR3nzo36WV1555ZU3GtR/nqi31fsX+X+L0cvQ5y37eUQvQz+38rKsVwhvZG6IvmXwWr3Xg7dV5P3Ou1fkNwNivaqdc/Z99N4Pa7smK5I51Lc=
+  </data>
+ </layer>
+</map>
