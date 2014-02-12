@@ -10,7 +10,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 
 /**
@@ -31,12 +33,23 @@ public class AbstractLevel implements Screen {
 	protected TiledMapTileLayer collision;
 	
 	// physics objects
-	protected ArrayList<Body> bodies = new ArrayList<Body>();
+	protected World world;
+	protected ArrayList<Body> surfaces = new ArrayList<Body>();
 
 	// game window attributes
 	protected float w;
 	protected float h;
 	public boolean loaded = false;
+	
+	// for debug rendering
+	protected boolean debug;
+	protected Box2DDebugRenderer dr;
+	protected Matrix4 debugMatrix;
+	
+	// Box2D constants
+	protected static final float TIMESTEP = 1.0f/60.0f;
+	protected static final int VEL_IT = 6;
+	protected static final int POS_IT = 2;
 
 
 	protected void updateCamera()
@@ -72,8 +85,8 @@ public class AbstractLevel implements Screen {
 			{
 				if( collision.getCell(x, y).getTile().getProperties().containsKey("floor") ) {
 					int bodyWidth = helpGround(x, y);
-					bodies.add( BodyFarm.createStaticBody(world, x * tileWidth, y * tileHeight, tileWidth * bodyWidth, tileHeight) );
-					bodies.get(bodies.size() - 1).setUserData("floor");
+					surfaces.add( BodyFarm.createStaticBody(world, x * tileWidth, y * tileHeight, tileWidth * bodyWidth, tileHeight) );
+					surfaces.get(surfaces.size() - 1).setUserData("floor");
 					x += bodyWidth;
 				}
 			}
@@ -98,8 +111,8 @@ public class AbstractLevel implements Screen {
 			{
 				if( collision.getCell(x, y).getTile().getProperties().containsKey("wall") ) {
 					int bodyHeight = helpWalls(x, y);
-					bodies.add( BodyFarm.createStaticBody(world, x * tileWidth, y * tileHeight, tileWidth, tileHeight * bodyHeight) );
-					bodies.get(bodies.size() - 1).setUserData("wall");
+					surfaces.add( BodyFarm.createStaticBody(world, x * tileWidth, y * tileHeight, tileWidth, tileHeight * bodyHeight) );
+					surfaces.get(surfaces.size() - 1).setUserData("wall");
 					y += bodyHeight;
 				}
 			}
