@@ -2,6 +2,7 @@ package com.me.boxing;
 
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
@@ -41,6 +42,31 @@ public class BodyFarm {
 		// define shape and size
 		PolygonShape shape = new PolygonShape();
 		shape.setAsBox(w/2 * PIXELS_TO_METERS, h/2 * PIXELS_TO_METERS);
+		
+		// create and define fixture
+		FixtureDef fd = new FixtureDef();
+		fd.shape = shape;
+		fd.density = 1;
+		fd.friction = 0.5f;
+		
+		// finished, create body and attach fixture to it
+		tmp = world.createBody(bd);
+		tmp.createFixture(fd);
+		return tmp;
+	}
+	
+	public static Body createDynamicBodyCircle(World world, float x, float y, float rad)
+	{
+		Body tmp;
+		
+		// define body position, make it dynamic
+		BodyDef bd = new BodyDef();
+		bd.position.set((x + rad) * PIXELS_TO_METERS, (y + rad) * PIXELS_TO_METERS);
+		bd.type = BodyType.DynamicBody;
+		
+		// define shape and size
+		CircleShape shape = new CircleShape();
+		shape.setRadius(rad * PIXELS_TO_METERS);
 		
 		// create and define fixture
 		FixtureDef fd = new FixtureDef();

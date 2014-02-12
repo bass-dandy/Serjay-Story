@@ -28,7 +28,7 @@ public class Pickup {
 		sprite.setOrigin(sprite.getX() + sprite.getWidth()/2, sprite.getY() + sprite.getHeight()/2);
 
 		// place sprite
-		sprite.setPosition(x, y);
+		sprite.setPosition(x + sprite.getWidth()/2, y);
 		
 		// load sound
 		sound = Gdx.audio.newSound(Gdx.files.internal(soundSource));

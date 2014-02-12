@@ -30,7 +30,7 @@ public class Boxing implements ApplicationListener {
 	private static final int GRAVITY = -15;
 
 	// is debug enabled?
-	private boolean debug = true;
+	private boolean debug = false;
 
 
 	@Override
@@ -69,9 +69,6 @@ public class Boxing implements ApplicationListener {
 	@Override
 	public void resize(int width, int height) 
 	{
-		if(debug)
-			Gdx.app.log("DEBUG", "resizing to " + width + " x " + height);
-		
 		level1.resize(width, height);
 	}
 

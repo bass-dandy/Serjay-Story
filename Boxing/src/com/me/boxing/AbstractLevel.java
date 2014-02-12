@@ -43,7 +43,7 @@ public class AbstractLevel implements Screen {
 	{
 		// center camera on player
 		float newX = player.getCenter().x;
-		float newY = player.getY() + 200;
+		float newY = player.getY();
 
 		// make sure camera doesn't leave the level
 		if(newX < w/2)
@@ -116,19 +116,19 @@ public class AbstractLevel implements Screen {
 		else return 1 + helpWalls(x, y + 1);
 	}
 	
-	/***********************************/
-	/****** IMPLEMENTED ELSEWHERE ******/
-	/***********************************/
-	
-	@Override
-	public void render(float delta) {}
-
 	@Override
 	public void resize(int width, int height) 
 	{
 		w = width;
 		h = height;
 	}
+	
+	/***********************************/
+	/****** IMPLEMENTED ELSEWHERE ******/
+	/***********************************/
+	
+	@Override
+	public void render(float delta) {}
 
 	@Override
 	public void show() {}

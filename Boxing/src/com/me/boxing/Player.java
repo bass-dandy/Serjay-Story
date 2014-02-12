@@ -38,7 +38,6 @@ public class Player {
 
 	// player state tracking
 	private boolean canJump = true;
-	private boolean falling = false;
 	private int numJumps = 2;
 	private boolean canTaunt = true;
 
@@ -47,7 +46,7 @@ public class Player {
 		// make player
 		Texture playerTex = new Texture(Gdx.files.internal(playerSource));
 		TextureRegion playerIMG = new TextureRegion(playerTex, 304, 336);
-		player = new DynamicPhysicsObject(world, playerIMG, x, y, W, H);
+		player = new DynamicPhysicsObject(world, playerIMG, x, y, (float)W/2);
 		player.setFixedRotation(true);
 		player.setFriction(FRICTION);
 		player.body.setUserData("player");
@@ -131,7 +130,7 @@ public class Player {
 	/***********************/
 	/****** ACCESSORS ******/
 	/***********************/
-
+	
 	public float getX() { return player.getX(); }
 
 	public float getY() { return player.getY(); }
@@ -153,4 +152,8 @@ public class Player {
 		Rectangle playerBounds = player.sprite.getBoundingRectangle();
 		return Intersector.overlaps(playerBounds, other);
 	}
+	
+	public void applyForceToCenter(Vector2 force) { player.body.applyForceToCenter(force, true); }
+	
+	public Vector2 getLinearVelocity() { return player.body.getLinearVelocity(); }
 }

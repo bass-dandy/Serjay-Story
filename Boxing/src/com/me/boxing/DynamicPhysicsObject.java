@@ -1,5 +1,6 @@
 package com.me.boxing;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -20,6 +21,7 @@ public class DynamicPhysicsObject {
 
 	// sizing and position info
 	public Vector2 pos;
+	private Vector2 center;
 	private int w;
 	private int h;
 	private float offsetX;
@@ -39,12 +41,42 @@ public class DynamicPhysicsObject {
 		sprite = new Sprite(img);
 		sprite.setSize(w, h);
 		sprite.setPosition(pos.x, pos.y);
+		
+		center = new Vector2(pos.x + w/2, pos.y + h/2);
+	}
+	
+	/**
+	 * Create a round dynamic physics object
+	 * @param world
+	 * @param img
+	 * @param x
+	 * @param y
+	 * @param rad
+	 */
+	public DynamicPhysicsObject(World world, TextureRegion img, int x, int y, float rad)
+	{
+		pos = new Vector2(x, y);
+		this.w = (int)rad*2;
+		this.h = (int)rad*2;
+		offsetX = rad;
+		offsetY = rad;
+
+		body = BodyFarm.createDynamicBodyCircle(world, pos.x, pos.y, rad);
+
+		// create and place sprite over its body
+		sprite = new Sprite(img);
+		sprite.setSize(w, h);
+		sprite.setPosition(pos.x, pos.y);
+		
+		center = new Vector2(pos.x + rad, pos.y + rad);
 	}
 
 	private void update()
 	{
-		pos.x = body.getPosition().x * Boxing.METERS_TO_PIXELS - offsetX;
-		pos.y = body.getPosition().y * Boxing.METERS_TO_PIXELS - offsetY;
+		center.x = body.getPosition().x * Boxing.METERS_TO_PIXELS;
+		center.y = body.getPosition().y * Boxing.METERS_TO_PIXELS;
+		pos.x = center.x - offsetX;
+		pos.y = center.y - offsetY;
 		sprite.setPosition(pos.x, pos.y);
 	}
 
@@ -72,5 +104,5 @@ public class DynamicPhysicsObject {
 
 	public int getHeight() { return h; }
 
-	public Vector2 getCenter() { return new Vector2(sprite.getX() + w/2, sprite.getY() + h/2); }
+	public Vector2 getCenter() { return center; }
 }
