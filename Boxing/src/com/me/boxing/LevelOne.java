@@ -83,14 +83,15 @@ public class LevelOne extends AbstractLevel {
 		// load entities
 		sky = new Texture(Gdx.files.internal(skySrc));
 		platform = new Platform(world, 64, 64, 32, 320);
-		gun = new Gun(player, camera);
+		if(debug)
+			gun = new Gun(player, camera);
 
 		// place pickups
 		pickups = new ArrayList<Pickup>();
-		pickups.add( new Pickup(35 * tileWidth, 3 * tileHeight) );
-		pickups.add( new Pickup(2 * tileWidth, 36 * tileHeight) );
-		pickups.add( new Pickup(41 * tileWidth, 42 * tileHeight) );
-		pickups.add( new Pickup(52 * tileWidth, 13 * tileHeight) );
+		pickups.add( new VodkaPickup(35 * tileWidth, 3 * tileHeight) );
+		pickups.add( new VodkaPickup(41 * tileWidth, 42 * tileHeight) );
+		pickups.add( new VodkaPickup(52 * tileWidth, 13 * tileHeight) );
+		pickups.add( new GunPickup(2 * tileWidth, 36 * tileHeight) );
 
 		// start playing song
 		if(!debug)
@@ -127,11 +128,13 @@ public class LevelOne extends AbstractLevel {
 			debugMatrix.scale(Boxing.METERS_TO_PIXELS, Boxing.METERS_TO_PIXELS, 1f);
 		}
 
-		// check if player has picked up vodka
+		// check if player has picked up an item
 		for(Pickup p: pickups)
 		{
 			if(player.isColliding(p.getBoundingRectangle()))
 				p.collected = true;
+			if(p.isGun && p.collected && gun == null)
+				gun = new Gun(player, camera);
 		}
 	}
 
@@ -150,7 +153,8 @@ public class LevelOne extends AbstractLevel {
 
 		platform.draw(batch);
 		player.draw(batch);	
-		gun.draw(batch);
+		if(gun != null)
+			gun.draw(batch);
 
 		batch.end();
 		
