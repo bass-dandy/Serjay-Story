@@ -4,6 +4,7 @@ package com.me.boxing;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Peripheral;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
@@ -40,6 +41,9 @@ public class LevelOne extends AbstractLevel {
 	private static final int GRAVITY = -15;
 	private static final float FRICTION = 0.1f;
 	private static final float WALL_FRICTION = 0.1f;
+	
+	// are we on Android?
+	public boolean accelerometer = Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer);
 
 
 	public LevelOne(SpriteBatch batch, boolean debug)
@@ -49,7 +53,7 @@ public class LevelOne extends AbstractLevel {
 
 		// create world and place player in it
 		world = new World(new Vector2(0, GRAVITY), true);
-		player = new Player(world, 64, 200);
+		player = new Player(world, 64, 200, accelerometer);
 		
 		// set up camera
 		camera = new OrthographicCamera(w, h);

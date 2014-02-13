@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
@@ -41,7 +42,9 @@ public class Player {
 	private int numJumps = 2;
 	private boolean canTaunt = true;
 
-	public Player(World world, int x, int y)
+	private boolean accelerometer;
+
+	public Player(World world, int x, int y, boolean accelerometer)
 	{
 		// make player
 		Texture playerTex = new Texture(Gdx.files.internal(playerSource));
@@ -56,22 +59,40 @@ public class Player {
 		taunts = new ArrayList<Sound>();
 		for(int i = 0; i < NUM_TAUNTS; i++)
 			taunts.add(Gdx.audio.newSound(Gdx.files.internal("sound/taunts/taunt" + i + ".wav") ));
+
+		this.accelerometer = accelerometer;
 	}
 
 	private void update()
 	{
 		Vector2 vel = player.getLinearVelocity();
 
-		// horizontal movement; accelerate and keep below speed limit, flip sprite if necessary
-		if(Gdx.input.isKeyPressed(Keys.A) && !Gdx.input.isKeyPressed(Keys.D) && vel.x > -WALK_MAX) {
-			player.body.applyForceToCenter(new Vector2(-WALK_ACCEL, 0), true);
-			if(player.sprite.isFlipX())
-				player.sprite.flip(true, false);
+		if(!accelerometer)
+		{
+			// horizontal movement; accelerate and keep below speed limit, flip sprite if necessary
+			if(Gdx.input.isKeyPressed(Keys.A) && !Gdx.input.isKeyPressed(Keys.D) && vel.x > -WALK_MAX) {
+				player.body.applyForceToCenter(new Vector2(-WALK_ACCEL, 0), true);
+				if(player.sprite.isFlipX())
+					player.sprite.flip(true, false);
+			}
+			else if(Gdx.input.isKeyPressed(Keys.D) && !Gdx.input.isKeyPressed(Keys.A) && vel.x < WALK_MAX) {
+				player.body.applyForceToCenter(new Vector2(WALK_ACCEL, 0), true);
+				if(!player.sprite.isFlipX())
+					player.sprite.flip(true, false);
+			}
 		}
-		else if(Gdx.input.isKeyPressed(Keys.D) && !Gdx.input.isKeyPressed(Keys.A) && vel.x < WALK_MAX) {
-			player.body.applyForceToCenter(new Vector2(WALK_ACCEL, 0), true);
-			if(!player.sprite.isFlipX())
-				player.sprite.flip(true, false);
+		else
+		{
+			if(Gdx.input.getAccelerometerY() < -1 && vel.x > -WALK_MAX) {
+				player.body.applyForceToCenter(new Vector2(-WALK_ACCEL, 0), true);
+				if(player.sprite.isFlipX())
+					player.sprite.flip(true, false);
+			}
+			else if(Gdx.input.getAccelerometerY() > 1 && vel.x < WALK_MAX) {
+				player.body.applyForceToCenter(new Vector2(WALK_ACCEL, 0), true);
+				if(!player.sprite.isFlipX())
+					player.sprite.flip(true, false);
+			}
 		}
 
 		if(vel.y == 0)
@@ -97,17 +118,30 @@ public class Player {
 				}
 			}
 		}
-
-		// jump if able
-		if(Gdx.input.isKeyPressed(Keys.W) && numJumps > 0 && canJump) {
-			player.body.setLinearVelocity(player.body.getLinearVelocity().x, JUMP);
-			numJumps--;
-			canJump = false;
+		if(!accelerometer)
+		{
+			// jump if able
+			if(Gdx.input.isKeyPressed(Keys.W) && numJumps > 0 && canJump) {
+				player.body.setLinearVelocity(player.body.getLinearVelocity().x, JUMP);
+				numJumps--;
+				canJump = false;
+			}
+			// player can only air jump after they release jump button
+			if(!Gdx.input.isKeyPressed(Keys.W))
+				canJump = true;
 		}
-
-		// player can only air jump after they release jump button
-		if(!Gdx.input.isKeyPressed(Keys.W))
-			canJump = true;
+		else
+		{
+			// jump if able
+			if(Gdx.input.isButtonPressed(Buttons.LEFT) && numJumps > 0 && canJump) {
+				player.body.setLinearVelocity(player.body.getLinearVelocity().x, JUMP);
+				numJumps--;
+				canJump = false;
+			}
+			// player can only air jump after they release jump button
+			if(!Gdx.input.isButtonPressed(Buttons.LEFT))
+				canJump = true;
+		}
 
 		// play taunt if able
 		if(Gdx.input.isKeyPressed(Keys.Q) && canTaunt) {
@@ -130,7 +164,7 @@ public class Player {
 	/***********************/
 	/****** ACCESSORS ******/
 	/***********************/
-	
+
 	public float getX() { return player.getX(); }
 
 	public float getY() { return player.getY(); }
@@ -152,8 +186,8 @@ public class Player {
 		Rectangle playerBounds = player.sprite.getBoundingRectangle();
 		return Intersector.overlaps(playerBounds, other);
 	}
-	
+
 	public void applyForceToCenter(Vector2 force) { player.body.applyForceToCenter(force, true); }
-	
+
 	public Vector2 getLinearVelocity() { return player.body.getLinearVelocity(); }
 }
