@@ -34,7 +34,7 @@ public class LevelOne extends AbstractLevel {
 	private ArrayList<Pickup> pickups;
 
 	// source files
-	private String mapSrc = "maps/map.tmx";
+	private String mapSrc = "maps/level1/map.tmx";
 	private String skySrc = "sky.png";
 
 	// physics constants
@@ -54,6 +54,7 @@ public class LevelOne extends AbstractLevel {
 		// create world and place player in it
 		world = new World(new Vector2(0, GRAVITY), true);
 		player = new Player(world, 64, 200, accelerometer);
+		
 		
 		// set up camera
 		camera = new OrthographicCamera(w, h);
@@ -102,7 +103,7 @@ public class LevelOne extends AbstractLevel {
 		{
 			song = Gdx.audio.newMusic(Gdx.files.internal("sound/music/level1.mp3"));
 			song.setLooping(true);
-			song.play();
+			//song.play();
 		}
 
 		// set up debug rendering

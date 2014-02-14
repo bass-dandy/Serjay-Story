@@ -13,6 +13,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.World;
 
@@ -83,16 +84,18 @@ public class Player {
 		}
 		else
 		{
-			if(Gdx.input.getAccelerometerY() < -1 && vel.x > -WALK_MAX) {
-				player.body.applyForceToCenter(new Vector2(-WALK_ACCEL, 0), true);
-				if(player.sprite.isFlipX())
-					player.sprite.flip(true, false);
-			}
-			else if(Gdx.input.getAccelerometerY() > 1 && vel.x < WALK_MAX) {
-				player.body.applyForceToCenter(new Vector2(WALK_ACCEL, 0), true);
-				if(!player.sprite.isFlipX())
-					player.sprite.flip(true, false);
-			}
+			float force = Gdx.input.getAccelerometerY() * 2;
+			player.body.applyForceToCenter(new Vector2(force, 0), true);
+
+			if(vel.x > WALK_MAX * 1.2f)
+				player.body.setLinearVelocity(WALK_MAX * 1.2f, vel.y);
+			else if(vel.x < -WALK_MAX * 1.2f)
+				player.body.setLinearVelocity(-WALK_MAX * 1.2f, vel.y);
+
+			if(player.sprite.isFlipX() && vel.x < -0.2)
+				player.sprite.flip(true, false);
+			else if(!player.sprite.isFlipX() && vel.x > 0.2)
+				player.sprite.flip(true, false);
 		}
 
 		if(vel.y == 0)
@@ -190,4 +193,6 @@ public class Player {
 	public void applyForceToCenter(Vector2 force) { player.body.applyForceToCenter(force, true); }
 
 	public Vector2 getLinearVelocity() { return player.body.getLinearVelocity(); }
+	
+	public Body getBody() { return player.body; }
 }

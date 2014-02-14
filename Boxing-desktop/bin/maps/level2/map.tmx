@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="100" height="54" tilewidth="32" tileheight="32">
+ <tileset firstgid="1" name="metro" tilewidth="32" tileheight="32">
+  <image source="metro.png" width="128" height="64"/>
+ </tileset>
+ <tileset firstgid="9" name="collision" tilewidth="32" tileheight="32">
+  <image source="collision.png" width="96" height="32"/>
+  <tile id="0">
+   <properties>
+    <property name="floor" value=""/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="wall" value=""/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer name="Tile Layer 1" width="100" height="54">
+  <data encoding="base64" compression="zlib">
+   eJztmTsOhTAMBOH973/il3YrhBKyGzMjubBEY2kHbLFv2/Zo9Wz1arUX61fj3erT6tvqV7C/G+78V/OjF3f+8UNx5x8/FHf+8SML/Miimh/u93vv96CaH+73e+/3AD/w40rceccPxZ13/FDceccPxZ13/FDceccPxZ13/FDceccPxZ13/FDceccPxZ13/FDceccPZfb/t9l+rObL7P9vs/1YzZe0/OBHVn7wY638HOHe93pZLT9HuPe9XvADP66kuh9p90daP5rZ96/7vq/uB/3YfvR+T9/X40dWjx9ZPX5k9fiR1afdE3cn7Z64O6Pzix99jM4vfvRBnrMgz1mwH2XBfpSF+x4dvc+tPq/7Hh29z519Pq1352H298g9T3U/zuKeBz8U9zz4objnwQ/FPQ9+KO55jvo/AZwxXQ==
+  </data>
+ </layer>
+ <layer name="collision" width="100" height="54" opacity="0">
+  <data encoding="base64" compression="zlib">
+   eJztnMESgjAMBbkq//+/DkfRQUJbs6R72JuOyduGWmFcl2VZBcOjkez65Z0noAbRBxV9sNh8tO5B7l91cD5ZVPORea3pcX2q5uNOfMteH/oQfRDRBwt9sNAHC32w0AcLfbDQBwt9sNDHb/55v0If8XxGvGdmH5G1ftXH1fmZzQeht6Ma9JFTQ2Qe96/Prr+aD3uo1UuFHir1UqGHSr1U6OGol+j+euYzfD6uzUfPtVhp/dJ8bMy8fok+RB+zoA8W+mAR/b47Yn/Ofl47m9ZZ6Dk/zmIfH73mRR+fHM3Smbx63/+Ttrxafg/RRxzz46IPHs4LF33w6Hk2OuM3ej7N/v+CyHmQxigf2X3dlRHZ6YOVnT5Y2emDlZ0+WNnpg5Ud3ccLENzk+A==
+  </data>
+ </layer>
+</map>

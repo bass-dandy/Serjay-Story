@@ -2,7 +2,6 @@ package com.me.boxing;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Peripheral;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -13,6 +12,7 @@ public class Boxing implements ApplicationListener {
 
 	// maps
 	private LevelOne level1;
+	private LevelTwo level2;
 
 	// Box2D constants
 	public static final float PIXELS_TO_METERS = 0.01f;
@@ -27,6 +27,7 @@ public class Boxing implements ApplicationListener {
 	{		
 		batch = new SpriteBatch();
 		level1 = new LevelOne(batch, debug);
+		level2 = new LevelTwo(batch, debug);
 	}
 
 	@Override
@@ -40,7 +41,7 @@ public class Boxing implements ApplicationListener {
 		}
 		
 		// draw
-		level1.render(Gdx.graphics.getDeltaTime());
+		level2.render(Gdx.graphics.getDeltaTime());
 	}
 
 	@Override
@@ -53,6 +54,7 @@ public class Boxing implements ApplicationListener {
 	public void resize(int width, int height) 
 	{
 		level1.resize(width, height);
+		level2.resize(width, height);
 	}
 
 	@Override
