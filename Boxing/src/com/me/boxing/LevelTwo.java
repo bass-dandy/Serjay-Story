@@ -2,6 +2,7 @@ package com.me.boxing;
 
 import java.util.ArrayList;
 
+import box2dLight.ConeLight;
 import box2dLight.PointLight;
 import box2dLight.RayHandler;
 
@@ -48,6 +49,7 @@ public class LevelTwo extends AbstractLevel {
 	// LIGHTING
 	RayHandler rh;
 	PointLight p;
+	ConeLight c;
 
 
 	public LevelTwo(SpriteBatch batch, boolean debug)
@@ -115,11 +117,10 @@ public class LevelTwo extends AbstractLevel {
 		
 		//LIGHTING
 		rh = new RayHandler(world);
-		rh.setShadows(true);
-		rh.setCulling(true);
-		rh.setBlur(true);
 		rh.setCombinedMatrix(camera.combined.cpy().scl(Boxing.PIXELS_TO_METERS));
-		p = new PointLight(rh, 64, new Color(1,1,1,0.8f), 5, player.getCenter().x, player.getCenter().y);
+		p = new PointLight(rh, 64, new Color(1, 1, 1, 0.8f), 2, player.getCenter().x, player.getCenter().y);
+		p.attachToBody(player.getBody(), 0, 0);
+		c = new ConeLight(rh, 128, new Color(1, 1, 1,0.8f), 8, player.getCenter().x, player.getCenter().y, 0, 30);
 	}
 	
 	private void update(float delta) 
@@ -150,7 +151,9 @@ public class LevelTwo extends AbstractLevel {
 		
 		//LIGHTING
 		rh.setCombinedMatrix(camera.combined.cpy().scl(Boxing.METERS_TO_PIXELS));
-		p.setPosition(player.getCenter().scl(Boxing.PIXELS_TO_METERS));
+		c.setPosition(player.getCenter().scl(Boxing.PIXELS_TO_METERS));
+		if(gun != null && c != null) 
+			c.setDirection(gun.getRotation());
 	}
 
 	@Override

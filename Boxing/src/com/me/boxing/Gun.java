@@ -155,4 +155,5 @@ public class Gun {
 
 	private void move(Vector2 pos) { gun.setPosition(pos.x - offsetX, pos.y - offsetY); }
 
+	public float getRotation() { return gun.getRotation(); }
 }
