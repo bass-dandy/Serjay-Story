@@ -29,6 +29,8 @@ public class LevelOne extends AbstractLevel {
 
 	// game objects
 	private Texture sky;
+	private Texture parallax1;
+	private Texture parallax2;
 	private Platform platform;
 	private Gun gun;
 	private ArrayList<Pickup> pickups;
@@ -36,6 +38,8 @@ public class LevelOne extends AbstractLevel {
 	// source files
 	private String mapSrc = "maps/level1/map.tmx";
 	private String skySrc = "sky.png";
+	private String parallax1Src = "skyline.png";
+	private String parallax2Src = "stalin.png";
 
 	// physics constants
 	private static final int GRAVITY = -15;
@@ -87,6 +91,8 @@ public class LevelOne extends AbstractLevel {
 
 		// load entities
 		sky = new Texture(Gdx.files.internal(skySrc));
+		parallax1 = new Texture(Gdx.files.internal(parallax1Src));
+		parallax2 = new Texture(Gdx.files.internal(parallax2Src));
 		platform = new Platform(world, 64, 64, 32, 320);
 		if(debug)
 			gun = new Gun(player, camera);
@@ -150,8 +156,11 @@ public class LevelOne extends AbstractLevel {
 
 		batch.begin();
 
-		if(!debug) 
+		if(!debug) {
 			batch.draw(sky, camera.position.x - w/2, camera.position.y - h/2, w, h);
+			batch.draw(parallax2, (camera.position.x - w/2)/2, (camera.position.y - h/2)/2, parallax2.getWidth(), parallax2.getHeight());
+			batch.draw(parallax1, (camera.position.x - w/2)/4, (camera.position.y - h/2)/4, parallax1.getWidth(), parallax1.getHeight());
+		}
 
 		for(Pickup p: pickups)
 			p.draw(batch);

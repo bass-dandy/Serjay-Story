@@ -41,7 +41,7 @@ public class Boxing implements ApplicationListener {
 		}
 		
 		// draw
-		level2.render(Gdx.graphics.getDeltaTime());
+		level1.render(Gdx.graphics.getDeltaTime());
 	}
 
 	@Override
