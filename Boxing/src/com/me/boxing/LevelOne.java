@@ -57,6 +57,7 @@ public class LevelOne extends AbstractLevel {
 
 		// create world and place player in it
 		world = new World(new Vector2(0, GRAVITY), true);
+		world.setContactListener(new PlayerContactListener());
 		player = new Player(world, 64, 200, accelerometer);
 		
 		
@@ -109,7 +110,7 @@ public class LevelOne extends AbstractLevel {
 		{
 			song = Gdx.audio.newMusic(Gdx.files.internal("sound/music/level1.mp3"));
 			song.setLooping(true);
-			//song.play();
+		//	song.play();
 		}
 
 		// set up debug rendering

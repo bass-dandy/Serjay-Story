@@ -9,8 +9,9 @@ public class Main {
 		LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "Serjay Story";
 		cfg.useGL20 = true;
-		cfg.width = 1200;
-		cfg.height = 675;
+	//	cfg.fullscreen = true;
+		cfg.width = 1280;
+		cfg.height = 720;
 		cfg.addIcon("icon.png", FileType.Internal);
 		
 		new LwjglApplication(new Boxing(), cfg);

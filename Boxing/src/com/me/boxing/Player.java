@@ -14,7 +14,8 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 public class Player {
@@ -39,8 +40,10 @@ public class Player {
 	private static final float FRICTION = 0.4f;
 
 	// player state tracking
-	private boolean canJump = true;
-	private int numJumps = 2;
+	public boolean canJump = true;
+	public boolean canWallJumpRight = false;
+	public boolean canWallJumpLeft = false;
+	public int numJumps = 2;
 	private boolean canTaunt = true;
 
 	private boolean accelerometer;
@@ -54,6 +57,15 @@ public class Player {
 		player.setFixedRotation(true);
 		player.setFriction(FRICTION);
 		player.body.setUserData("player");
+		
+		// attach sensors
+		PolygonShape shape = new PolygonShape();
+		shape.setAsBox(W/4 * Boxing.PIXELS_TO_METERS, 2 * Boxing.PIXELS_TO_METERS, new Vector2(0, -H/2 * Boxing.PIXELS_TO_METERS), 0f);
+		FixtureDef fd = new FixtureDef();
+		fd.shape = shape;
+		fd.density = 0.0f;
+		fd.isSensor = true;
+		player.body.createFixture(fd).setUserData("foot");
 
 		// load taunts
 		r = new Random();
@@ -98,29 +110,6 @@ public class Player {
 				player.sprite.flip(true, false);
 		}
 
-		if(vel.y == 0)
-		{
-			// check contacts
-			for(Contact c : player.body.getWorld().getContactList())
-			{
-				Object userDataA = c.getFixtureA().getBody().getUserData();
-				Object userDataB = c.getFixtureB().getBody().getUserData();
-				float verticalA = c.getFixtureA().getBody().getPosition().y;
-				float verticalB = c.getFixtureB().getBody().getPosition().y;
-
-				// if player is colliding with a floor and player is above the floor
-				if( (userDataA.equals("floor") && userDataB.equals("player") && verticalA < verticalB )
-						|| (userDataA.equals("player") && userDataB.equals("floor") && verticalA > verticalB) ) 
-				{
-					canJump = true;
-					numJumps = 2;
-				}
-				else if( (userDataA.equals("platform") && userDataB.equals("player")) || (userDataA.equals("player") && userDataB.equals("platform")) ) {
-					canJump = true;
-					numJumps = 2;
-				}
-			}
-		}
 		if(!accelerometer)
 		{
 			// jump if able

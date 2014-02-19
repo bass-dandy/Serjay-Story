@@ -13,6 +13,11 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
+import com.badlogic.gdx.physics.box2d.Contact;
+import com.badlogic.gdx.physics.box2d.ContactImpulse;
+import com.badlogic.gdx.physics.box2d.ContactListener;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.physics.box2d.World;
 
 /**
@@ -31,7 +36,7 @@ public class AbstractLevel implements Screen {
 	protected Player player;
 	protected TiledMap map;
 	protected TiledMapTileLayer collision;
-	
+
 	// physics objects
 	protected World world;
 	protected ArrayList<Body> surfaces = new ArrayList<Body>();
@@ -40,12 +45,12 @@ public class AbstractLevel implements Screen {
 	protected float w;
 	protected float h;
 	public boolean loaded = false;
-	
+
 	// for debug rendering
 	protected boolean debug;
 	protected Box2DDebugRenderer dr;
 	protected Matrix4 debugMatrix;
-	
+
 	// Box2D constants
 	protected static final float TIMESTEP = 1.0f/60.0f;
 	protected static final int VEL_IT = 6;
@@ -71,7 +76,7 @@ public class AbstractLevel implements Screen {
 		// set new viewport size
 		camera.viewportWidth = Gdx.graphics.getWidth();
 		camera.viewportHeight = Gdx.graphics.getHeight();
-		
+
 		// set new camera position
 		camera.position.set(newX, newY, 0);
 		batch.setProjectionMatrix(camera.combined);
@@ -92,17 +97,17 @@ public class AbstractLevel implements Screen {
 			}
 		}
 	}
-	
+
 	private int helpGround(int x, int y)
 	{
 		if( x >= collision.getWidth() )
 			return 0;
 		else if( !collision.getCell(x, y).getTile().getProperties().containsKey("floor") )
 			return 0;
-		
+
 		else return 1 + helpGround(x + 1, y);
 	}
-	
+
 	protected void makeWalls(World world, float tileWidth, float tileHeight)
 	{
 		for(int x = 0; x < collision.getWidth(); x++)
@@ -118,28 +123,30 @@ public class AbstractLevel implements Screen {
 			}
 		}
 	}
-	
+
 	private int helpWalls(int x, int y)
 	{
 		if( y >= collision.getHeight() )
 			return 0;
 		else if( !collision.getCell(x, y).getTile().getProperties().containsKey("wall") )
 			return 0;
-		
+
 		else return 1 + helpWalls(x, y + 1);
 	}
-	
+
 	@Override
 	public void resize(int width, int height) 
 	{
 		w = width;
 		h = height;
 	}
-	
+
+
 	/***********************************/
 	/****** IMPLEMENTED ELSEWHERE ******/
 	/***********************************/
-	
+
+
 	@Override
 	public void render(float delta) {}
 
@@ -157,4 +164,65 @@ public class AbstractLevel implements Screen {
 
 	@Override
 	public void dispose() {}
+
+
+	/*******************************************/
+	/****** NESTED CONTACT LISTENER CLASS ******/
+	/*******************************************/
+
+
+	// handle interactions between the player and the world; specifically, when can the player jump?
+	public class PlayerContactListener implements ContactListener {
+
+		@Override
+		public void beginContact(Contact contact) 
+		{
+			Fixture a  = contact.getFixtureA();
+			Fixture b = contact.getFixtureB();
+
+			// if player is on ground or platform, he can jump normally
+			if( a.getBody().getUserData().equals("player") && (b.getBody().getUserData().equals("floor") || b.getBody().getUserData().equals("platform")) )
+			{
+				if(a.getUserData().equals("foot"))
+				{
+					player.canJump = true;
+					player.numJumps = 2;
+
+					Gdx.app.log("begin contact", "player can jump");
+				}
+			}
+		}
+
+		@Override
+		public void endContact(Contact contact) 
+		{
+			Fixture a  = contact.getFixtureA();
+			Fixture b = contact.getFixtureB();
+
+			// check if player just fell of a ledge or platform, if so he can only air jump once
+			if( a.getBody().getUserData().equals("player") && (b.getBody().getUserData().equals("floor") || b.getBody().getUserData().equals("platform")) )
+			{
+				if(a.getUserData().equals("foot"))
+				{
+					if(player.numJumps > 1)
+						player.numJumps = 1;
+
+					Gdx.app.log("end contact", "player fell");
+				}
+			}
+		}
+
+		@Override
+		public void preSolve(Contact contact, Manifold oldManifold) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void postSolve(Contact contact, ContactImpulse impulse) {
+			// TODO Auto-generated method stub
+
+		}
+
+	}
 }
