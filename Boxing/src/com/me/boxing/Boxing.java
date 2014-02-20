@@ -19,7 +19,7 @@ public class Boxing implements ApplicationListener {
 	public static final float METERS_TO_PIXELS = 100f;
 
 	// is debug enabled?
-	private boolean debug = true;
+	private boolean debug = false;
 
 
 	@Override

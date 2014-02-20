@@ -14,8 +14,6 @@ import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
-import com.badlogic.gdx.physics.box2d.FixtureDef;
-import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 public class Player {
@@ -34,16 +32,24 @@ public class Player {
 	private static final int H = 60;
 
 	// movement constants
-	private static final float JUMP = 7f;
 	private static final float WALK_ACCEL = 10f;
 	private static final float WALK_MAX = 2.5f;
 	private static final float FRICTION = 0.4f;
+	private static final float JUMP = 7f;
+	private static final float WALL_JUMP_PAUSE = 0.35f;
+	private static final float WALL_JUMP_VEL_X = 2.5f;
+	private static final float 	WALL_JUMP_VEL_Y = 7.5f;
 
-	// player state tracking
-	public boolean canJump = true;
+	// jump logic tracking
+	private boolean canJump = true;
 	public boolean canWallJumpRight = false;
 	public boolean canWallJumpLeft = false;
-	public int numJumps = 2;
+	public boolean airborne = true;
+	private int numJumps = 2;
+	private boolean canAirControl = true;
+	private float time = 0f;
+	private float lastWallJump = 0f;
+
 	private boolean canTaunt = true;
 
 	private boolean accelerometer;
@@ -57,15 +63,11 @@ public class Player {
 		player.setFixedRotation(true);
 		player.setFriction(FRICTION);
 		player.body.setUserData("player");
-		
+
 		// attach sensors
-		PolygonShape shape = new PolygonShape();
-		shape.setAsBox(W/4 * Boxing.PIXELS_TO_METERS, 2 * Boxing.PIXELS_TO_METERS, new Vector2(0, -H/2 * Boxing.PIXELS_TO_METERS), 0f);
-		FixtureDef fd = new FixtureDef();
-		fd.shape = shape;
-		fd.density = 0.0f;
-		fd.isSensor = true;
-		player.body.createFixture(fd).setUserData("foot");
+		player.attachSensor(W/4, 2, new Vector2(0, -H/2 * Boxing.PIXELS_TO_METERS), "foot");
+		player.attachSensor(2, H/4, new Vector2(-W/2 * Boxing.PIXELS_TO_METERS, 0), "left");
+		player.attachSensor(2, H/4, new Vector2(W/2 * Boxing.PIXELS_TO_METERS, 0), "right");
 
 		// load taunts
 		r = new Random();
@@ -79,50 +81,86 @@ public class Player {
 	private void update()
 	{
 		Vector2 vel = player.getLinearVelocity();
+		time += Gdx.graphics.getDeltaTime();
 
-		if(!accelerometer)
+		/*******************************/
+		/***** HORIZONTAL MOVEMENT *****/
+		/*******************************/
+
+		if(!accelerometer) // MOVEMENT CONTROLS FOR DESKTOP
 		{
-			// horizontal movement; accelerate and keep below speed limit, flip sprite if necessary
-			if(Gdx.input.isKeyPressed(Keys.A) && !Gdx.input.isKeyPressed(Keys.D) && vel.x > -WALK_MAX) {
-				player.body.applyForceToCenter(new Vector2(-WALK_ACCEL, 0), true);
-				if(player.sprite.isFlipX())
-					player.sprite.flip(true, false);
+			if(!airborne) // MOVE NORMALLY IF PLAYER IS GROUNDED
+			{
+				if(Gdx.input.isKeyPressed(Keys.A) && !Gdx.input.isKeyPressed(Keys.D) && vel.x > -WALK_MAX)
+					player.body.applyForceToCenter(new Vector2(-WALK_ACCEL, 0), true);
+				else if(Gdx.input.isKeyPressed(Keys.D) && !Gdx.input.isKeyPressed(Keys.A) && vel.x < WALK_MAX)
+					player.body.applyForceToCenter(new Vector2(WALK_ACCEL, 0), true);
 			}
-			else if(Gdx.input.isKeyPressed(Keys.D) && !Gdx.input.isKeyPressed(Keys.A) && vel.x < WALK_MAX) {
-				player.body.applyForceToCenter(new Vector2(WALK_ACCEL, 0), true);
-				if(!player.sprite.isFlipX())
-					player.sprite.flip(true, false);
+			else if(canAirControl) // REDUCE MOBILITY IN THE AIR
+			{
+				if(Gdx.input.isKeyPressed(Keys.A) && !Gdx.input.isKeyPressed(Keys.D) && vel.x > -WALK_MAX)
+					player.body.applyForceToCenter(new Vector2(-WALK_ACCEL/2, 0), true);
+				else if(Gdx.input.isKeyPressed(Keys.D) && !Gdx.input.isKeyPressed(Keys.A) && vel.x < WALK_MAX)
+					player.body.applyForceToCenter(new Vector2(WALK_ACCEL/2, 0), true);
 			}
 		}
-		else
+		else // MOVEMENT CONTROLS FOR ANDROID
 		{
 			float force = Gdx.input.getAccelerometerY() * 2;
 			player.body.applyForceToCenter(new Vector2(force, 0), true);
-
-			if(vel.x > WALK_MAX * 1.2f)
-				player.body.setLinearVelocity(WALK_MAX * 1.2f, vel.y);
-			else if(vel.x < -WALK_MAX * 1.2f)
-				player.body.setLinearVelocity(-WALK_MAX * 1.2f, vel.y);
-
-			if(player.sprite.isFlipX() && vel.x < -0.2)
-				player.sprite.flip(true, false);
-			else if(!player.sprite.isFlipX() && vel.x > 0.2)
-				player.sprite.flip(true, false);
 		}
 
-		if(!accelerometer)
+		// flip player sprite if he changes direction
+		if(player.sprite.isFlipX() && vel.x < -0.2)
+			player.sprite.flip(true, false);
+		else if(!player.sprite.isFlipX() && vel.x > 0.2)
+			player.sprite.flip(true, false);
+
+		/**********************/
+		/***** JUMP LOGIC *****/
+		/**********************/
+
+		if(!airborne)
 		{
-			// jump if able
-			if(Gdx.input.isKeyPressed(Keys.W) && numJumps > 0 && canJump) {
+			canJump = true;
+			canAirControl = true;
+			numJumps = 2;
+		}
+		else
+		{
+			if(numJumps > 1)
+				numJumps = 1;
+			if(time - lastWallJump > WALL_JUMP_PAUSE)
+				canAirControl = true;
+		}
+
+		if(!accelerometer) // JUMP CONTROLS FOR DESKTOP
+		{
+			// jump if able and not attached to wall
+			if(Gdx.input.isKeyPressed(Keys.W) && numJumps > 0 && canJump && !canWallJumpRight && !canWallJumpLeft) {
 				player.body.setLinearVelocity(player.body.getLinearVelocity().x, JUMP);
 				numJumps--;
 				canJump = false;
+			}
+			// wall jump right if able
+			else if(Gdx.input.isKeyPressed(Keys.W) && canWallJumpRight && canJump) {
+				player.body.setLinearVelocity(WALL_JUMP_VEL_X, WALL_JUMP_VEL_Y);
+				canJump = false;
+				canAirControl = false;
+				lastWallJump = time;
+			}
+			// wall jump left if able
+			else if(Gdx.input.isKeyPressed(Keys.W) && canWallJumpLeft && canJump) {
+				player.body.setLinearVelocity(-WALL_JUMP_VEL_X, WALL_JUMP_VEL_Y);
+				canJump = false;
+				canAirControl = false;
+				lastWallJump = time;
 			}
 			// player can only air jump after they release jump button
 			if(!Gdx.input.isKeyPressed(Keys.W))
 				canJump = true;
 		}
-		else
+		else // JUMP CONTROLS FOR ANDROID
 		{
 			// jump if able
 			if(Gdx.input.isButtonPressed(Buttons.LEFT) && numJumps > 0 && canJump) {
@@ -134,6 +172,10 @@ public class Player {
 			if(!Gdx.input.isButtonPressed(Buttons.LEFT))
 				canJump = true;
 		}
+
+		/***************************/
+		/***** PLAYER TAUNTING *****/
+		/***************************/
 
 		// play taunt if able
 		if(Gdx.input.isKeyPressed(Keys.Q) && canTaunt) {
@@ -182,6 +224,6 @@ public class Player {
 	public void applyForceToCenter(Vector2 force) { player.body.applyForceToCenter(force, true); }
 
 	public Vector2 getLinearVelocity() { return player.body.getLinearVelocity(); }
-	
+
 	public Body getBody() { return player.body; }
 }

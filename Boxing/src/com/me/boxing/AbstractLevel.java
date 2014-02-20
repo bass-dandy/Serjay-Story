@@ -180,16 +180,22 @@ public class AbstractLevel implements Screen {
 			Fixture a  = contact.getFixtureA();
 			Fixture b = contact.getFixtureB();
 
-			// if player is on ground or platform, he can jump normally
+			// if player is on ground or platform, he is not airborne
 			if( a.getBody().getUserData().equals("player") && (b.getBody().getUserData().equals("floor") || b.getBody().getUserData().equals("platform")) )
 			{
-				if(a.getUserData().equals("foot"))
-				{
-					player.canJump = true;
-					player.numJumps = 2;
-
-					Gdx.app.log("begin contact", "player can jump");
+				if(a.getUserData().equals("foot")) {
+					player.airborne = false;
+					player.canWallJumpLeft = false;
+					player.canWallJumpRight = false;
 				}
+			}
+			// if player is not on ground and is touching a wall, he can walljump
+			else if( a.getBody().getUserData().equals("player") && (b.getBody().getUserData().equals("wall")) )
+			{
+				if(a.getUserData().equals("left") && player.airborne)
+					player.canWallJumpRight = true;
+				else if(a.getUserData().equals("right") && player.airborne)
+					player.canWallJumpLeft = true;
 			}
 		}
 
@@ -199,15 +205,18 @@ public class AbstractLevel implements Screen {
 			Fixture a  = contact.getFixtureA();
 			Fixture b = contact.getFixtureB();
 
-			// check if player just fell of a ledge or platform, if so he can only air jump once
+			// if player fell off a ledge or platform, he is airborne
 			if( a.getBody().getUserData().equals("player") && (b.getBody().getUserData().equals("floor") || b.getBody().getUserData().equals("platform")) )
 			{
-				if(a.getUserData().equals("foot"))
+				if(a.getUserData().equals("foot")) player.airborne = true;
+			}
+			// check if player detached from wall
+			else if( a.getBody().getUserData().equals("player") && (b.getBody().getUserData().equals("wall")) )
+			{
+				if(a.getUserData().equals("left") || a.getUserData().equals("right"))
 				{
-					if(player.numJumps > 1)
-						player.numJumps = 1;
-
-					Gdx.app.log("end contact", "player fell");
+					player.canWallJumpRight = false;
+					player.canWallJumpLeft = false;
 				}
 			}
 		}

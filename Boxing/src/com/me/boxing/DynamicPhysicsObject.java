@@ -5,6 +5,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.physics.box2d.FixtureDef;
+import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 
 
@@ -70,6 +72,17 @@ public class DynamicPhysicsObject {
 		center = new Vector2(pos.x + rad, pos.y + rad);
 	}
 
+	public void attachSensor(float w, float h, Vector2 offset, String userData)
+	{
+		PolygonShape shape = new PolygonShape();
+		shape.setAsBox(w * Boxing.PIXELS_TO_METERS, h * Boxing.PIXELS_TO_METERS, offset, 0f);
+		FixtureDef fd = new FixtureDef();
+		fd.shape = shape;
+		fd.density = 0.0f;
+		fd.isSensor = true;
+		body.createFixture(fd).setUserData(userData);
+	}
+	
 	private void update()
 	{
 		center.x = body.getPosition().x * Boxing.METERS_TO_PIXELS;

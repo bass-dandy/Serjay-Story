@@ -21,6 +21,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
 
+
 public class LevelTwo extends AbstractLevel {
 
 	private Music song;
@@ -47,9 +48,9 @@ public class LevelTwo extends AbstractLevel {
 	public boolean accelerometer = Gdx.input.isPeripheralAvailable(Peripheral.Accelerometer);
 	
 	// LIGHTING
-	RayHandler rh;
-	PointLight p;
-	ConeLight c;
+	private RayHandler rh;
+	private PointLight p;
+	private ConeLight c;
 
 
 	public LevelTwo(SpriteBatch batch, boolean debug)
@@ -59,6 +60,7 @@ public class LevelTwo extends AbstractLevel {
 
 		// create world and place player in it
 		world = new World(new Vector2(0, GRAVITY), true);
+		world.setContactListener(new PlayerContactListener());
 		player = new Player(world, 64, 49 * 32, accelerometer);
 		
 		// set up camera
